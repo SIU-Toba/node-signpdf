@@ -134,31 +134,35 @@ describe('Test signing', () => {
     //     expect(signature1).not.toBe(signature2);
     //     expect(signature1).toHaveLength(signature2.length);
     // });
-    // it('signs a ready pdf', async () => {
-    //     const p12Buffer = fs.readFileSync(`${__dirname}/../resources/certificate.p12`);
-    //     let pdfBuffer = fs.readFileSync(`${__dirname}/../resources/w3dummy.pdf`);
-    //     pdfBuffer = plainAddPlaceholder({
-    //         pdfBuffer,
-    //         reason: 'I have reviewed it.',
-    //         signatureLength: 1612,
-    //     });
-    //     pdfBuffer = signer.sign(pdfBuffer, p12Buffer);
+    it('signs a ready pdf', async () => {
+        //const p12Buffer = fs.readFileSync(`${__dirname}/../resources/certificate.p12`);
+        const p12Buffer = fs.readFileSync(`${__dirname}/../resources/withpass.p12`);
+        let pdfBuffer = fs.readFileSync(`${__dirname}/../resources/empty.pdf`);
+        pdfBuffer = plainAddPlaceholder({
+            pdfBuffer,
+            reason: 'I have reviewed it.',
+            signatureLength: 3388,
+        });
+        pdfBuffer = signer.sign(pdfBuffer, p12Buffer, { passphrase: 'node-signpdf'});
 
-    //     const {signature, signedData} = extractSignature(pdfBuffer);
-    //     expect(typeof signature === 'string').toBe(true);
-    //     expect(signedData instanceof Buffer).toBe(true);
-    // });
+        fs.writeFileSync(`${__dirname}/../resources/empty-sigp12.pdf`, pdfBuffer);
+        const {signature, signedData} = extractSignature(pdfBuffer);
+        expect(typeof signature === 'string').toBe(true);
+        expect(signedData instanceof Buffer).toBe(true);
+    });
     it('signs a ready pdf with pkcs11', async () => {
         let pdfBuffer = fs.readFileSync(`${__dirname}/../resources/empty.pdf`);
         pdfBuffer = plainAddPlaceholder({
             pdfBuffer,
             reason: 'I have reviewed it.',
+            signatureLength: 3388
             // signatureLength: 1612
         });
         pdfBuffer = signer.signPkcs11(pdfBuffer);
 
         fs.writeFileSync(`${__dirname}/../resources/empty-sigpkcs11.pdf`, pdfBuffer);
         const {signature, signedData} = extractSignature(pdfBuffer);
+        //console.log(signature.toString());
         expect(typeof signature === 'string').toBe(true);
         expect(signedData instanceof Buffer).toBe(true);
     });
